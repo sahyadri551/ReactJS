@@ -10,6 +10,12 @@ function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    authService.getCurrentUser().then(user => {
+      console.log('Auth check:', user)  // null = no session, object = logged in
+    })
+  }, [])
+
+  useEffect(() => {
     authService.getCurrentUser()
       .then((userData) => {
         if (userData) {
@@ -28,7 +34,7 @@ function App() {
   ) : (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
-      <main className="flex-grow">
+      <main className="grow">
         <Outlet />
       </main>
       <Footer />
