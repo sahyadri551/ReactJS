@@ -16,19 +16,15 @@ function Select({ label, error, options = [], className = '', id, ...props }) {
             )}
 
             <div className="relative">
-                <select
-                    id={selectId}
-                    className={cn(
-                        'w-full px-3 py-2.5 text-sm rounded-lg appearance-none',
-                        'bg-white text-slate-900',
-                        'border border-slate-300',
-                        'transition-all duration-150',
-                        'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-                        error && 'border-red-400 focus:ring-red-400',
-                        className
-                    )}
-                    {...props}
-                >
+                <select id={selectId} className={cn(
+                    'w-full px-3 py-2.5 text-sm rounded-lg appearance-none',
+                    'bg-white text-slate-900',
+                    'border border-slate-300',
+                    'transition-all duration-150',
+                    'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
+                    error && 'border-red-400 focus:ring-red-400',
+                    className
+                )} {...props}>
                     {options.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                             {opt.label}

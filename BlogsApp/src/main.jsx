@@ -5,6 +5,10 @@ import './index.css'
 import { Provider } from 'react-redux'
 import store from './store/store.js'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { ProtectedRoute } from './components'
+import { Login, Signup, Home, AllPosts } from './pages'
+
+// import AddPost from './pages/AddPost.jsx'
 
 // This creates the routing context your Header requires
 const router = createBrowserRouter([
@@ -12,7 +16,11 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      // We will add your page routes (Home, Login, AddPost) here next
+      { path: '/', element: <Home /> },
+      { path: '/all-posts', element: <AllPosts /> },
+      // { path: '/add-post', element: <ProtectedRoute><AddPost /></ProtectedRoute> },
+      { path: '/signup', element: <ProtectedRoute requireAuth={false}><Signup /></ProtectedRoute> },
+      { path: '/login', element: <ProtectedRoute requireAuth={false}><Login /></ProtectedRoute> }
     ],
   },
 ])

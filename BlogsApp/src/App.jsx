@@ -4,6 +4,7 @@ import authService from './appwrite/auth'
 import { login, logout } from './store/authSlice'
 import { Outlet } from 'react-router-dom'
 import { Header, Footer } from './components'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -29,6 +30,7 @@ function App() {
 
   return loading ? (
     <div className="min-h-screen flex items-center justify-center">
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
       <h1 className="text-2xl">Loading...</h1>
     </div>
   ) : (

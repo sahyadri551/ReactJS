@@ -1,14 +1,7 @@
 import PropTypes from 'prop-types'
 import { cn } from '../../utils/cn'
 
-function Button({
-    children,
-    variant = 'primary',
-    size = 'md',
-    className = '',
-    disabled = false,
-    ...props
-}) {
+function Button({ children, variant = 'primary', size = 'md', className = '', disabled = false, ...props }) {
     const base = [
         'inline-flex items-center justify-center font-medium',
         'transition-all duration-150 cursor-pointer',
