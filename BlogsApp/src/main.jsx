@@ -6,11 +6,8 @@ import { Provider } from 'react-redux'
 import store from './store/store.js'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from './components'
-import { Login, Signup, Home, AllPosts } from './pages'
+import { Login, Signup, Home, AllPosts, Post, AddPost, EditPost } from './pages'
 
-// import AddPost from './pages/AddPost.jsx'
-
-// This creates the routing context your Header requires
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,7 +15,9 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       { path: '/all-posts', element: <AllPosts /> },
-      // { path: '/add-post', element: <ProtectedRoute><AddPost /></ProtectedRoute> },
+      { path: '/post/:slug', element: <Post /> },
+      { path: '/add-post', element: <ProtectedRoute><AddPost /></ProtectedRoute> },
+      { path: '/edit/:slug', element: <ProtectedRoute><EditPost /></ProtectedRoute> },
       { path: '/signup', element: <ProtectedRoute requireAuth={false}><Signup /></ProtectedRoute> },
       { path: '/login', element: <ProtectedRoute requireAuth={false}><Login /></ProtectedRoute> }
     ],
@@ -27,7 +26,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* This provides the Redux context your Header requires */}
+    {/* This provides the Redux context that Header requires */}
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>

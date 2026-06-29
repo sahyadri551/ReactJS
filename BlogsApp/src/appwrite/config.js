@@ -20,14 +20,7 @@ export class Service {
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
                 rowId: slug,
-                data: {
-                    title,
-                    content,
-                    featuredImage,
-                    status,
-                    userId,
-                    slug
-                }
+                data: { title, content, featuredImage, status, userId, slug }
             });
         } catch (error) {
             console.log("Appwrite service :: createPost :: error :: ", error);
@@ -41,12 +34,7 @@ export class Service {
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
                 rowId: slug,
-                data: {
-                    title,
-                    content,
-                    featuredImage,
-                    status,
-                }
+                data: { title, content, featuredImage, status, }
             });
         } catch (error) {
             console.log("Appwrite service :: updatePost :: error :: ", error);
@@ -70,11 +58,12 @@ export class Service {
 
     async getPost(slug) {
         try {
-            return await this.tablesDB.getRow({
+            const result = await this.tablesDB.listRows({
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
-                rowId: slug
+                queries: [Query.equal('slug', slug)]
             });
+            return result.rows[0] ?? null;
         } catch (error) {
             console.log("Appwrite service :: getPost :: error :: ", error);
             return false;
@@ -82,12 +71,12 @@ export class Service {
     }
 
     async getPosts(queries = [Query.equal("status", "active")]) {
+        const finalQueries = [...queries, Query.orderDesc("$createdAt")];
         try {
             return await this.tablesDB.listRows({
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
-                queries: queries,
-                orderDesc: ["created_at"]
+                queries: finalQueries,
             });
         } catch (error) {
             console.log("Appwrite service :: getPosts :: error :: ", error);
@@ -122,10 +111,11 @@ export class Service {
     }
 
     getFilePreview(fileId) {
-        return this.bucket.getFilePreview({
+        const url = this.bucket.getFileView({
             bucketId: conf.appwriteBucketId,
-            fileId: fileId
+            fileId
         });
+        return url?.href ?? String(url);
     }
 }
 

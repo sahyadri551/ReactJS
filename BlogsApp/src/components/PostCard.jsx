@@ -1,11 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import postService from '../appwrite/config'
 import { stripHtml } from '../utils/stripHtml'
 import { formatDate } from '../utils/formatDate'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 
-// Deterministic gradient per post — same post always gets the same colors,
-// used as a monogram fallback when there's no featured image.
 const GRADIENTS = [
     'from-indigo-500 to-violet-600',
     'from-blue-500 to-indigo-600',
@@ -18,16 +17,20 @@ function gradientFor(str = '') {
     const sum = [...str].reduce((acc, ch) => acc + ch.codePointAt(0), 0)
     return GRADIENTS[sum % GRADIENTS.length]
 }
+
 function PostCard({ post }) {
     const { $id, title, slug, featuredImage, content, $createdAt } = post
+    const [imgFailed, setImgFailed] = useState(false)
     const excerpt = stripHtml(content).slice(0, 110)
     const imageUrl = featuredImage ? postService.getFilePreview(featuredImage) : null
+    const showImage = imageUrl && !imgFailed
+
     return (
         <Link to={`/post/${slug}`} className="group flex flex-col rounded-xl border border-slate-200 bg-white overflow-hidden hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5">
-            {/* Media */}
             <div className="aspect-16/10 w-full overflow-hidden">
-                {imageUrl ? (
-                    <img src={imageUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                {showImage ? (
+                    <img src={imageUrl} alt={title} onError={() => setImgFailed(true)}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 ) : (
                     <div className={`w-full h-full bg-linear-to-br ${gradientFor($id)} flex items-center justify-center`}>
                         <span className="text-4xl font-extrabold text-white/90">
@@ -37,7 +40,6 @@ function PostCard({ post }) {
                 )}
             </div>
 
-            {/* Body */}
             <div className="flex flex-col flex-1 p-5">
                 <p className="text-xs font-medium text-indigo-500 mb-1.5">
                     {formatDate($createdAt)}
@@ -62,9 +64,16 @@ function PostCard({ post }) {
     )
 }
 
-// props validation
+// Props Validation
 PostCard.propTypes = {
-    post: PropTypes.object.isRequired,
+    post: PropTypes.shape({
+        $id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        featuredImage: PropTypes.string,
+        content: PropTypes.string.isRequired,
+        $createdAt: PropTypes.string.isRequired,
+    }),
 }
 
 export default PostCard

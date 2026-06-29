@@ -10,11 +10,6 @@ function App() {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    authService.getCurrentUser().then(user => {
-      console.log('Auth check:', user)  // null = no session, object = logged in
-    })
-  }, [])
 
   useEffect(() => {
     authService.getCurrentUser()
@@ -34,7 +29,7 @@ function App() {
       <h1 className="text-2xl">Loading...</h1>
     </div>
   ) : (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="grow">
         <Outlet />
