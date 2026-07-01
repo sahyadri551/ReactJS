@@ -6,7 +6,7 @@ import parse from 'html-react-parser'
 import toast from 'react-hot-toast'
 import postService from '../appwrite/config'
 import { deletePost as removePost } from '../store/postSlice'
-import { Container, Button, DeleteModal } from '../components'
+import { Container, Button, DeleteModal, LikeButton, CommentSection } from '../components'
 import { formatDate } from '../utils/formatDate'
 
 const SKELETON_LINES = [
@@ -157,14 +157,23 @@ function Post() {
 
                 {/* Featured image */}
                 {post.featuredImage && (
-                    <figure className="mb-10 rounded-xl overflow-hidden border border-slate-100">
-                        <img src={postService.getFilePreview(post.featuredImage)} alt={post.title} className="w-full object-cover" />
+                    <figure className="mb-10 rounded-xl overflow-hidden border border-slate-100 aspect-video h-60">
+                        <img src={postService.getFilePreview(post.featuredImage)} alt={post.title} className="w-full h-full object-cover" />
                     </figure>
                 )}
 
                 <article className="post-content">
                     {parse(cleanContent)}
                 </article>
+
+                <div className="mt-10 pt-8 border-t border-slate-100 flex items-center gap-3">
+                    <LikeButton postId={post.$id} />
+                    <span className="text-sm text-slate-400">
+                        {post.userId === userData?.$id ? 'Your post' : 'Did you find this helpful?'}
+                    </span>
+                </div>
+
+                <CommentSection postId={post.$id} />
             </Container>
             <DeleteModal isOpen={showModal} onClose={() => setShowModal(false)} onConfirm={handleDelete} isDeleting={isDeleting} postTitle={post.title} />
         </>
