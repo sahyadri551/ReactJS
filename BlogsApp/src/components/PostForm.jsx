@@ -9,6 +9,7 @@ import Button from './ui/Button'
 import Input from './ui/Input'
 import Select from './ui/Select'
 import RichTextEditor from './RichTextEditor'
+import TagInput from './ui/TagInput'
 import { slugify } from '../utils/slugify'
 import { cn } from '../utils/cn'
 import PropTypes from 'prop-types'
@@ -43,14 +44,13 @@ function PostForm({ post }) {
             setValue('slug', slugify(titleValue), { shouldValidate: true })
         }
     }, [titleValue, isEdit, setValue])
-    const initialPreview = post?.featuredImage
-        ? postService.getFilePreview(post.featuredImage)
-        : null
 
+    const initialPreview = post?.featuredImage ? postService.getFilePreview(post.featuredImage) : null
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState(initialPreview)
     const [removedImage, setRemovedImage] = useState(false)
     const [fileInputKey, setFileInputKey] = useState(0)   // remounts input on clear
+    const [tags, setTags] = useState(post?.tags ?? [])
 
     const handleImageChange = (e) => {
         const file = e.target.files?.[0]
@@ -83,15 +83,17 @@ function PostForm({ post }) {
             }
 
             if (isEdit) {
-                const updated = await postService.updatePost(post.$id, { title: data.title, content: data.content, featuredImage, status: data.status, })
+                const updated = await postService.updatePost(post.$id, { title: data.title, content: data.content, featuredImage, status: data.status, tags, })
+                if (!updated) throw new Error('Update failed')
                 dispatch(storeUpdatePost(updated))
                 toast.success('Post updated')
                 navigate(`/post/${post.slug}`)
             } else {
                 const created = await postService.createPost({
                     title: data.title, slug: data.slug, content: data.content,
-                    featuredImage, status: data.status, userId: userData.$id,
+                    featuredImage, status: data.status, userId: userData.$id, tags,
                 })
+                if (!created) throw new Error('Create failed')
                 dispatch(addPost(created))
                 toast.success('Post published')
                 navigate(`/post/${data.slug}`)
@@ -128,7 +130,6 @@ function PostForm({ post }) {
                         )}
                     </div>
 
-                    {/* TinyMCE */}
                     <div className="flex flex-col gap-1.5">
                         <label htmlFor="content" className="text-sm font-medium text-slate-700">Content</label>
                         <div className={cn('rounded-lg overflow-hidden border',
@@ -155,6 +156,10 @@ function PostForm({ post }) {
                                 Cancel
                             </button>
                         )}
+                    </div>
+
+                    <div className="border border-slate-200 rounded-xl p-5 bg-white">
+                        <TagInput tags={tags} onChange={setTags} />
                     </div>
 
                     <div className="border border-slate-200 rounded-xl p-5 flex flex-col gap-3 bg-white">
@@ -187,7 +192,6 @@ function PostForm({ post }) {
     )
 }
 
-// Props Validation
 PostForm.propTypes = {
     post: PropTypes.shape({
         $id: PropTypes.string.isRequired,
@@ -196,6 +200,7 @@ PostForm.propTypes = {
         status: PropTypes.string.isRequired,
         featuredImage: PropTypes.string,
         content: PropTypes.string.isRequired,
+        tags: PropTypes.arrayOf(PropTypes.string),
         $createdAt: PropTypes.string.isRequired,
     }),
     isEdit: PropTypes.bool,

@@ -14,13 +14,13 @@ export class Service {
         this.bucket = new Storage(this.client);
     }
 
-    async createPost({ title, slug, content, featuredImage, status, userId }) {
+    async createPost({ title, slug, content, featuredImage, status, tags = [], userId }) {
         try {
             return await this.tablesDB.createRow({
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
                 rowId: slug,
-                data: { title, content, featuredImage, status, userId, slug }
+                data: { title, content, featuredImage, status, userId, slug, tags }
             });
         } catch (error) {
             console.log("Appwrite service :: createPost :: error :: ", error);
@@ -28,13 +28,13 @@ export class Service {
         }
     }
 
-    async updatePost(slug, { title, content, featuredImage, status }) {
+    async updatePost(slug, { title, content, featuredImage, status, tags = [] }) {
         try {
             return await this.tablesDB.updateRow({
                 databaseId: conf.appwriteDatabaseId,
                 tableId: conf.appwriteCollectionId,
                 rowId: slug,
-                data: { title, content, featuredImage, status, }
+                data: { title, content, featuredImage, status, tags }
             });
         } catch (error) {
             console.log("Appwrite service :: updatePost :: error :: ", error);
@@ -80,6 +80,19 @@ export class Service {
             });
         } catch (error) {
             console.log("Appwrite service :: getPosts :: error :: ", error);
+            return false;
+        }
+    }
+
+    async getUserPosts(userId) {
+        try {
+            return await this.tablesDB.listRows({
+                databaseId: conf.appwriteDatabaseId,
+                tableId: conf.appwriteCollectionId,
+                queries: [Query.equal("userId", userId), Query.orderDesc("$createdAt")],
+            });
+        } catch (error) {
+            console.log("Appwrite service :: getUserPosts :: error :: ", error);
             return false;
         }
     }

@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import store from './store/store.js'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from './components'
-import { Login, Signup, Home, AllPosts, Post, AddPost, EditPost } from './pages'
+import { Login, Signup, Home, AllPosts, Post, AddPost, EditPost, Profile } from './pages'
 
 const router = createBrowserRouter([
   {
@@ -19,7 +19,8 @@ const router = createBrowserRouter([
       { path: '/add-post', element: <ProtectedRoute><AddPost /></ProtectedRoute> },
       { path: '/edit/:slug', element: <ProtectedRoute><EditPost /></ProtectedRoute> },
       { path: '/signup', element: <ProtectedRoute requireAuth={false}><Signup /></ProtectedRoute> },
-      { path: '/login', element: <ProtectedRoute requireAuth={false}><Login /></ProtectedRoute> }
+      { path: '/login', element: <ProtectedRoute requireAuth={false}><Login /></ProtectedRoute> },
+      { path: '/Profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
     ],
   },
 ])

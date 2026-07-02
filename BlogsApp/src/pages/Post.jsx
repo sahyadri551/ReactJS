@@ -36,7 +36,6 @@ function PostSkeleton() {
         </Container>
     )
 }
-
 function PostNotFound() {
     return (
         <Container className="max-w-3xl py-32 text-center">
@@ -93,7 +92,9 @@ function Post() {
         if (!post) return
         setIsDeleting(true)
         try {
-            await postService.deletePost(post.$id)
+            const deleted = await postService.deletePost(post.$id)
+            if (!deleted) throw new Error('Delete failed')
+
             if (post.featuredImage) {
                 await postService.deleteFile(post.featuredImage)
             }
@@ -105,10 +106,8 @@ function Post() {
             setIsDeleting(false)
         }
     }
-
     if (pageStatus === STATUS.LOADING) return <PostSkeleton />
     if (pageStatus === STATUS.NOT_FOUND) return <PostNotFound />
-
     const cleanContent = DOMPurify.sanitize(post.content)
 
     return (
@@ -123,7 +122,6 @@ function Post() {
                         </svg>
                         All posts
                     </Link>
-
                     {isOwner && (
                         <div className="flex items-center gap-2">
                             <Link to={`/edit/${post.slug}`}>
@@ -143,8 +141,6 @@ function Post() {
                         </div>
                     )}
                 </div>
-
-                {/* Article header */}
                 <header className="mb-10">
                     <p className="text-sm font-medium text-indigo-500 mb-3 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
@@ -153,27 +149,33 @@ function Post() {
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
                         {post.title}
                     </h1>
+                    {post.tags?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-4">
+                            {post.tags.map((tag) => (
+                                <Link key={tag} to={`/all-posts?tag=${encodeURIComponent(tag)}`} className="px-2.5 py-1 rounded-full bg-slate-100 
+                                text-slate-500 text-xs font-medium hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                    {tag}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </header>
-
-                {/* Featured image */}
                 {post.featuredImage && (
-                    <figure className="mb-10 rounded-xl overflow-hidden border border-slate-100 aspect-video h-60">
-                        <img src={postService.getFilePreview(post.featuredImage)} alt={post.title} className="w-full h-full object-cover" />
+                    <figure className="mb-10 rounded-xl overflow-hidden border border-slate-100 aspect-video h-3/4">
+                        <img src={postService.getFilePreview(post.featuredImage)} alt={post.title} className="w-full h-full object-contain" />
                     </figure>
                 )}
-
                 <article className="post-content">
                     {parse(cleanContent)}
                 </article>
-
                 <div className="mt-10 pt-8 border-t border-slate-100 flex items-center gap-3">
                     <LikeButton postId={post.$id} />
                     <span className="text-sm text-slate-400">
                         {post.userId === userData?.$id ? 'Your post' : 'Did you find this helpful?'}
                     </span>
                 </div>
-
                 <CommentSection postId={post.$id} />
+
             </Container>
             <DeleteModal isOpen={showModal} onClose={() => setShowModal(false)} onConfirm={handleDelete} isDeleting={isDeleting} postTitle={post.title} />
         </>
